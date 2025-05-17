@@ -1,5 +1,5 @@
 import pytest
-from ..src.monitor import check_discord_api, check_bot_discloud
+from src.monitor import check_discord_api, check_bot_discloud
 
 def test_discord_api_status():
     status = check_discord_api()
