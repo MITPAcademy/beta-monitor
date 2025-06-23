@@ -10,12 +10,24 @@ import sys
 import os
 from datetime import datetime, timedelta, timezone
 
+# logging
+from loguru import logger
+
+os.makedirs("logs", exist_ok=True)
+logger.add("logs/bot_status_{time}.log", rotation="10 MB", retention="10 days", compression="zip", level="DEBUG")
+logger.info("Logger initialized.")
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    logger.exception("Unhandled exception:", exc_info=(exc_type, exc_value, exc_traceback))
+sys.excepthook = handle_exception
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 def start_local_bot():
+    logger.info("Starting local bot with 'start-bot.bat'")
     subprocess.Popen(["start", "start-bot.bat"], shell=True)
 
 class LanguageSwitcher(View):
@@ -44,17 +56,14 @@ class LanguageSwitcher(View):
             try:
                 await interaction.response.send_message(embed=embed, ephemeral=True)
             except discord.errors.NotFound:
-                # Interaction expired or is unknown, ignore or optionally log this event
-                pass
+                logger.warning("Tried to respond to an expired interaction.")
         return callback
 
     async def interaction_check(self, interaction: Interaction) -> bool:
         return True
 
 async def add_footer(bot, embed):
-    # Get bot latency (ping)
     ping_ms = round(bot.latency * 1000)
-    # Get current time in GMT-3 (Brasilia) using timezone-aware objects
     now_utc = datetime.now(timezone.utc)
     now_gmt3 = now_utc.astimezone(timezone(timedelta(hours=-3)))
     time_str = now_gmt3.strftime("%Y-%m-%d %H:%M:%S")
@@ -62,16 +71,20 @@ async def add_footer(bot, embed):
     embed.set_footer(text=footer_text)
 
 async def send_status_message(channel, lang=DEFAULT_LANG):
+    logger.info("Checking Discord API and bot status...")
     api_online = check_discord_api()
     bot_online = check_bot_discloud()
 
     if api_online and not bot_online:
         message = translate("The bot is offline. Restarting it locally...", lang)
+        logger.warning("Bot is offline. Restarting locally...")
         start_local_bot()
     elif not api_online:
         message = translate("Discord API is down. Bot is offline due to Discord issues.", lang)
+        logger.error("Discord API is down.")
     else:
         message = translate("Everything is online. Bot is running normally.", lang)
+        logger.success("All systems online. Bot is running.")
 
     embed = discord.Embed(title=translate("Beta Bot Status", lang), description=message, color=discord.Color.red())
     await add_footer(bot, embed)
@@ -80,15 +93,16 @@ async def send_status_message(channel, lang=DEFAULT_LANG):
 
 @bot.event
 async def on_ready():
-    print(f"online: {bot.user}")
+    logger.success(f"Bot is online as: {bot.user}")
     monitor_bot.start()
 
 @tasks.loop(minutes=5)
 async def monitor_bot():
+    logger.info("Running bot monitoring loop.")
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
         await send_status_message(channel, lang=DEFAULT_LANG)
     else:
-        print(f"Channel with ID {CHANNEL_ID} not found.")
+        logger.error(f"Channel with ID {CHANNEL_ID} not found.")
 
 bot.run(BOT_TOKEN)
