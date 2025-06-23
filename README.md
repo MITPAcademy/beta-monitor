@@ -46,3 +46,8 @@ If the bot goes offline while the Discord API is operational, this system automa
 - **Googletrans** — Language translation.
 - **PyWin32 / win10toast** — Desktop notifications (Windows only).
 - **GitHub Actions** — CI for testing.
+
+---
+
+## 📝 License
+This project is licensed under the terms specified in the LICENSE file.
