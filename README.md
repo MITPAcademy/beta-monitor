@@ -1,16 +1,16 @@
-# MITPA Bot Watchdog — Auto-Restart & Multilingual Status Monitoring
+# PRACTA Bot Watchdog — Auto-Restart & Multilingual Status Monitoring
 
 > 🛰️ Automatic bot monitoring and recovery system for MIT Preparation Academy's beta bot.
 ## Overview
 
-**MITPA Bot Watchdog** is a local monitoring utility built to ensure that the MITPA beta bot, hosted on **Discloud**, stays online.  
+**PRACTA Bot Watchdog** is a local monitoring utility built to ensure that the PRACTA beta bot, hosted on **Discloud**, stays online.  
 If the bot goes offline while the Discord API is operational, this system automatically restarts the bot locally and notifies the admin — all while supporting multilingual status messages for global accessibility.
 
 ---
 
 ## 🌟 Purpose
 
-- Automatically detect if the MITPA beta bot is offline.
+- Automatically detect if the PRACTA beta bot is offline.
 - Distinguish between bot failure and Discord API outages.
 - Restart the bot locally via Node.js in a separate desktop workspace.
 - Send real-time notifications to Discord for transparency.

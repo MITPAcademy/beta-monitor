@@ -6,7 +6,7 @@ for /f "tokens=1,2 delims==" %%a in (config.cfg) do (
 )
 
 REM
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module BurntToast; New-BurntToastNotification -Text 'MITPA Monitor', 'The beta bot is down and is being launched locally.'"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module BurntToast; New-BurntToastNotification -Text 'PRACTA Monitor', 'The beta bot is down and is being launched locally.'"
 
 cd /d "%BOT_PATH%"
 npm start
